@@ -40,6 +40,7 @@ jobs:
       - name: Build Calamares on Arch Linux
         run: |
           git clone https://aur.archlinux.org/calamares-git
+          sudo chmod -R 777 $BUILDDIR ./calamares-git
           cd calamares-git
           sed -i 's/3\.3\.5\(-[^ ]*\)/3.7-git/' PKGBUILD
           sudo -u builder makepkg -fcs --noconfirm
