@@ -34,7 +34,7 @@ jobs:
         run: |
           git clone https://aur.archlinux.org/ckbcomp
           sudo chmod -R 777 ./ckbcomp
-          cd ckbcomp-git
+          cd ckbcomp
           sudo -u builder makepkg -si --noconfirm
           cd
 
@@ -44,7 +44,7 @@ jobs:
           sudo chmod -R 777 $BUILDDIR ./calamares-git
           cd calamares-git
           sed -i 's/3\.3\.5\(-[^ ]*\)/3.7-git/' PKGBUILD
-          sudo -u builder makepkg -fcs --noconfirm
+          sudo -u builder makepkg -cf --noconfirm
 
       - name: Release artifacts
         env:
