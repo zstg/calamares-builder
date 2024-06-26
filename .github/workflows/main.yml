@@ -32,11 +32,12 @@ jobs:
           
       - name: Install ckbcomp
         run: |
-          git clone https://aur.archlinux.org/ckbcomp
-          sudo chmod -R 777 ./ckbcomp
-          cd ckbcomp
-          sudo -u builder makepkg -si --noconfirm
-          cd
+          # git clone https://aur.archlinux.org/ckbcomp
+          # sudo chmod -R 777 ./ckbcomp
+          # cd ckbcomp
+          # sudo -u builder makepkg -si --noconfirm
+          # cd
+          sudo pacman -U https://github.com/StratOS-Linux/StratOS-repo/blob/main/x86_64/ckbcomp-1.226-1-any.pkg.tar.zst
 
       - name: Build Calamares on Arch Linux
         run: |
