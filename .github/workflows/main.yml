@@ -24,7 +24,7 @@ jobs:
           pacman -Syu --noconfirm
           pacman -S sudo --noconfirm
           echo -e "\n[StratOS-repo]\nSigLevel = Optional TrustAll\nServer = https://StratOS-Linux.github.io/StratOS-repo/x86_64" | sudo tee -a /etc/pacman.conf
-          sudo pacman -Syy ckbcomp git wget ninja qt6-tools base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
+          sudo pacman -Syy ckbcomp fd git wget ninja qt6-tools base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
 
       - name: Create dummy user for makepkg
         run: |
@@ -44,6 +44,10 @@ jobs:
       - name: Set build date
         run: echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
 
+      - name: Find package file
+        id: find_pkg
+        run: echo "PACKAGE_PATH=$(fd -Hgai -t f -iname '*.pkg.tar.zst')" >> $GITHUB_ENV
+
       - name: Create GitHub Release
         id: create_release
         uses: actions/create-release@latest
@@ -62,6 +66,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: $(find ~+ -type f -iname "**.pkg.tar.zst")
+          asset_path: ${{ env.PACKAGE_PATH }}
           asset_name: calamares-${{ env.BUILD_DATE }}.pkg.tar.zst
           asset_content_type: application/octet-stream
