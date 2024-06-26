@@ -21,8 +21,9 @@ jobs:
     steps:
       - name: Checkout repository using git
         run: |
+          echo -e "\n[StratOS-repo]\nSigLevel = Optional TrustAll\nServer = https://StratOS-Linux.github.io/StratOS-repo/x86_64" | sudo tee -a etc/pacman.conf
           pacman -Sy git sudo --noconfirm
-          sudo pacman -S base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
+          sudo pacman -S wget base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
 
       - name: Create dummy user for makepkg
         run: |
@@ -32,12 +33,8 @@ jobs:
           
       - name: Install ckbcomp
         run: |
-          # git clone https://aur.archlinux.org/ckbcomp
-          # sudo chmod -R 777 ./ckbcomp
-          # cd ckbcomp
-          # sudo -u builder makepkg -si --noconfirm
-          # cd
-          sudo pacman -U ./ckbcomp-1.226-1-any.pkg.tar.zst
+          sudo pacman -S ckbcomp --noconfirm
+
 
       - name: Build Calamares on Arch Linux
         run: |
