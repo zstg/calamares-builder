@@ -4,8 +4,8 @@ on:
   push:
     branches:
       - main
-  #schedule:
-  #  - cron: '0 0 * * *'  # Schedule to run every day at 12 AM UTC
+  # schedule:
+  #   - cron: '0 0 * * *'  # Schedule to run every day at 12 AM UTC
 
 jobs:
   build:
@@ -23,18 +23,13 @@ jobs:
         run: |
           pacman -Sy sudo --noconfirm
           echo -e "\n[StratOS-repo]\nSigLevel = Optional TrustAll\nServer = https://StratOS-Linux.github.io/StratOS-repo/x86_64" | sudo tee -a /etc/pacman.conf
-          sudo pacman -Syy git wget ninja qt6-tools base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
+          sudo pacman -Syy ckbcomp git wget ninja qt6-tools base-devel cmake fakeroot github-cli extra-cmake-modules yaml-cpp boost qt5-base qt5-declarative hwinfo python-jsonschema python-yaml solid squashfs-tools qt5-quickcontrols2 qt5-svg qt5-tools qt5-translations qt5-webengine libpwquality libyaml kpmcore kcoreaddons ki18n kconfig kservice kwidgetsaddons kiconthemes kitemviews kxmlgui kbookmarks kcompletion --needed --noconfirm
 
       - name: Create dummy user for makepkg
         run: |
           sudo useradd -m builder -s /bin/bash
           sudo usermod -aG wheel builder
-          sudo echo '%wheel ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
-          
-      - name: Install ckbcomp
-        run: |
-          sudo pacman -S ckbcomp --noconfirm
-
+          echo '%wheel ALL=(ALL) NOPASSWD:ALL' | sudo tee -a /etc/sudoers
 
       - name: Build Calamares on Arch Linux
         run: |
@@ -44,14 +39,27 @@ jobs:
           sed -i 's/3\.3\.5\(-[^ ]*\)/3.7-git/' PKGBUILD
           sudo -u builder makepkg -cf --noconfirm
 
-      - name: Release artifacts
+      - name: Set build date
+        run: echo "BUILD_DATE=$(date +%Y%m%d)" >> $GITHUB_ENV
+
+      - name: Create GitHub Release
+        id: create_release
+        uses: actions/create-release@latest
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          mkdir -p release
-          mv *.pkg.tar.zst release/
-          cd release
-          for file in *.pkg.tar.zst; do
-            echo "Uploading $file to releases"
-            gh release upload $GITHUB_REPOSITORY@$GITHUB_RUN_ID "$file"
-          done
+        with:
+          tag_name: v${{ env.BUILD_DATE }}
+          release_name: v${{ env.BUILD_DATE }}
+          body: |
+            Automated release powered by GitHub Actions.
+
+      - name: Upload package as Release Asset
+        id: upload_asset
+        uses: actions/upload-release-asset@latest
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./calamares-git/*.pkg.tar.zst
+          asset_name: calamares-${{ env.BUILD_DATE }}.pkg.tar.zst
+          asset_content_type: application/octet-stream
