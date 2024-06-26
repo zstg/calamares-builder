@@ -32,7 +32,7 @@ jobs:
           
       - name: Install ckbcomp
         run: |
-          git clone https://aur.archlinux.org/ckbcomp.git
+          git clone https://aur.archlinux.org/ckbcomp
           sudo chmod -R 777 ./ckbcomp
           cd ckbcomp-git
           sudo -u builder makepkg -si --noconfirm
