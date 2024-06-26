@@ -14,6 +14,9 @@ jobs:
       contents: write
       pull-requests: write
       repository-projects: write
+    container:
+      image: archlinux/archlinux:latest
+      options: --privileged
 
     steps:
       - name: Checkout repository using git
